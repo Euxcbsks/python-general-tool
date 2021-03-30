@@ -5,11 +5,17 @@ __all__ = [
 ]
 
 def rel_chdir(path):
-	if path.startswith('...'):
-		layer, path = path.split('/', 1)
-		
-		while len(layer) > 1:
+	def cd_out(layer):
+		while layer > 1:
 			chdir('..')
-			layer = layer[1:]
+			layer -= 1
 	
-	chdir(path)
+	if path.startswith('...'):
+		if '/' in path:
+			layer, path = path.split('/', 1)
+			cd_out(len(layer))
+			chdir(path)
+		else:
+			cd_out(len(path))
+	else:
+		chdir(path)
