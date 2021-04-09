@@ -20,28 +20,45 @@ def config(**paras):
 	
 	def update_config_data():
 		changelog = 'change log:'
+		#all_checks = {"check_name": check_by_default}
+		all_checks = {"type_check": True}
+
+		#auto generate
+		need_check = {check: paras.get(check, all_checks[check]) for check in all_checks}
+		check_to_func = {check: locals()[f"check_{check.split('_')[0]}"] for check in all_checks}
+		checks = [check_to_func[k] for k, v in need_check if v]
 		
-		for k, v in paras.items():
-			#Check type
+		#customize check
+		def check_type():
 			if type(v) != type(config_data[k]):
-				raise TypeError(f"value of '{k}' must be {config_data[k].__class__.__name__}, not {v.__class__.__name__}")
-			#Check value, if not same, update changelog and config_data
-			if config_data[k] != v:
-				changelog = changelog + f"\n  '{k}': {config_data[k]} -> {v}"
+				raise TypeError(f"value of '{k}' must be '{config_data[k].__class__.__name__}', not '{v.__class__.__name__}'")
+		
+		#run check and update
+		def update_config_data():
+			if v != config_data[k]:
+				changelog += f"\n  '{k}': {config_data[k]} -> {v}"
 				config_data[k] = v
 		
+		if checks:
+			for k, v in paras:
+				for check in checks:
+					check()
+				update_config_data()
+		else:
+			for k, v in paras:
+				update_config_data()
+		
 		if changelog == 'change log:':
-			changelog = changelog + '\n  Nothing changed'
+			changelog += '\n  Nothing changed'
 		
 		return changelog
-		
+	
 	def save_config():
 		with open(config_file_path, 'w', encoding = 'UTF-8') as config_file:
 			json.dump(config_data, config_file, indent = '\t')
 		
-	if len(paras) == 0:
-		print(json.dumps(config_data, indent = '    '))
-		return
+	if not paras:
+		return json.dumps(config_data, indent = '    ')
 	
 	print(update_config_data())
 	
