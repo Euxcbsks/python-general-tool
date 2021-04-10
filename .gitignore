@@ -1,2 +1,4 @@
 __main__.py
 *.pyc
+
+.vscode/
