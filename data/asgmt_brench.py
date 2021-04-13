@@ -1,13 +1,10 @@
 __all__ = ["asgmt_brench"]
 
 def class_name(obj):
-	#type
-	if obj is type:
-		return obj.__class__.__name__
-	#str, list, tuple, dict, ......
+	#built-in
 	if type(obj) is type:
 		return obj().__class__.__name__
-	#custom class
+	#type or custom class
 	return obj.__class__.__name__
 
 def raise_TpE(para, *valid_types):
@@ -32,22 +29,23 @@ def raise_TpE(para, *valid_types):
 	#raise it as return
 	raise_error(para, *valid_types)
 
-def asgmt_brench(obj, brench_type: str, brench: dict, *, obj_sig = None):
+def asgmt_brench(obj, conditional, brench: dict, *, obj_sig = None, additional = None):
 	def str_brench(obj, brench):
-		if type(obj) is not str:
-			raise_TpE("obj when brench_type == 'str'", str)
-
-		return brench[obj]
+		try:
+			return brench[obj]
+		except KeyError:
+			raise_TpE("obj when conditional == 'str'", str)
 
 	def type_brench(obj, brench, obj_sig):
-		obj_type = class_name(obj)
-		
-		if obj_type not in brench:
+		try:
+			return brench[class_name(obj)]
+		except KeyError:
 			raise_TpE(obj_sig, *brench.keys())
-		
-		return brench[obj_type]
-
-	return eval(str_brench(brench_type, {
-		"str": "str_brench(obj, brench)",
-		"type": "type_brench(obj, brench, obj_sig)"
-		}))
+	
+	return eval(type_brench(conditional, {
+		"str": """eval(str_brench(conditional, {
+			"str": "str_brench(obj, brench)",
+			"type": "type_brench(obj, brench, obj_sig)"
+		}))""",
+		"function": "eval(conditional(obj, brench))"
+	}))
