@@ -36,7 +36,7 @@ def asgmt_brench(obj, conditional, brench: dict, *, obj_sig = None, additional =
 		except KeyError:
 			raise_TpE("obj when conditional == 'str'", str)
 
-	def type_brench(obj, brench, obj_sig):
+	def type_brench(obj, brench, *, obj_sig = None):
 		try:
 			return brench[class_name(obj)]
 		except KeyError:
@@ -45,7 +45,7 @@ def asgmt_brench(obj, conditional, brench: dict, *, obj_sig = None, additional =
 	return eval(type_brench(conditional, {
 		"str": """eval(str_brench(conditional, {
 			"str": "str_brench(obj, brench)",
-			"type": "type_brench(obj, brench, obj_sig)"
+			"type": "type_brench(obj, brench, obj_sig = obj_sig)"
 		}))""",
 		"function": "eval(conditional(obj, brench))"
 	}))
