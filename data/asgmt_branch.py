@@ -1,4 +1,4 @@
-__all__ = ["asgmt_brench"]
+__all__ = ["asgmt_branch"]
 
 def class_name(obj):
 	#built-in
@@ -29,23 +29,23 @@ def raise_TpE(para, *valid_types):
 	#raise it as return
 	raise_error(para, *valid_types)
 
-def asgmt_brench(obj, conditional, brench: dict, *, obj_sig = None, additional = None):
-	def str_brench(obj, brench):
+def asgmt_branch(obj, conditional, branch: dict, *, obj_sig = None, additional = None):
+	def str_branch(obj, branch):
 		try:
-			return brench[obj]
+			return branch[obj]
 		except KeyError:
 			raise_TpE("obj when conditional == 'str'", str)
 
-	def type_brench(obj, brench, *, obj_sig = None):
+	def type_branch(obj, branch, *, obj_sig = None):
 		try:
-			return brench[class_name(obj)]
+			return branch[class_name(obj)]
 		except KeyError:
-			raise_TpE(obj_sig, *brench.keys())
+			raise_TpE(obj_sig, *branch.keys())
 	
-	return eval(type_brench(conditional, {
-		"str": """eval(str_brench(conditional, {
-			"str": "str_brench(obj, brench)",
-			"type": "type_brench(obj, brench, obj_sig = obj_sig)"
-		}))""",
-		"function": "eval(conditional(obj, brench))"
+	return eval(type_branch(conditional, {
+		"str": """str_branch(conditional, {
+			"str": "str_branch(obj, branch)",
+			"type": "type_branch(obj, branch, obj_sig = obj_sig)"
+		})""",
+		"function": "conditional(obj, branch)"
 	}))
