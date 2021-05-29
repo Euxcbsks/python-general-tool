@@ -1,15 +1,9 @@
-target = dict()
-token_separate = "."
-
-def token_parser(token):
-	if token_separate in token:
-		#don't want use "global" to avoid Unbound local error
-		copy_target = target
-		
-		#overwrite "copy_target" with subtarget
-		for k in token.split(token_separate):
-			copy_target = copy_target[k]
+def token_parser(target: dict, token, separate = '.'):
+	if separate in token:
+		#overwrite "target" with subtarget
+		for k in token.split(separate):
+			target = target[k]
 	else:
-		copy_target = target[token]
+		target = target[token]
 	
-	return copy_target
+	return target
